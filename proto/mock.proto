@@ -1,0 +1,69 @@
+syntax = "proto3";
+package github.com.monlabs.grpc_mock;
+
+option go_package = "./mock;grpc_mock_api";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+service Mock {
+    rpc AddStubs(AddStubsRequest) returns (AddStubsResponse) {
+        option (google.api.http) = {
+            post: "/v1/stubs"
+            body: "*"
+        };
+    }
+
+    rpc FindStubs(FindStubsRequest) returns (FindStubsResponse) {
+        option (google.api.http) = {
+            get: "/v1/stubs"
+        };
+    }
+
+    rpc DeleteStubs(DeleteStubsRequest) returns (DeleteStubsResponse) {
+        option (google.api.http) = {
+            delete: "/v1/stubs"
+        };
+    }
+}
+
+message AddStubsRequest {
+    repeated Stub stubs = 1;
+}
+message AddStubsResponse {}
+
+message FindStubsRequest{
+    string service = 1;
+    string method = 2;
+    google.protobuf.Struct in = 3;
+}
+message FindStubsResponse{
+    repeated Stub stubs = 1;
+}
+
+message DeleteStubsRequest{
+    string service = 1;
+    string method = 2;
+}
+message DeleteStubsResponse{}
+
+message Stub {
+    string service = 1;
+    string method = 2;
+    Input in = 3;
+    Output out = 4;
+}
+
+message Input {
+    oneof rule {
+        google.protobuf.Struct equals = 1;
+        google.protobuf.Struct contains = 2;
+        google.protobuf.Struct matches = 3;
+    }
+}
+
+message Output {
+    google.protobuf.Struct data = 1;
+    int32 code = 2;
+    string error = 3;
+}
