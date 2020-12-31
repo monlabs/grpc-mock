@@ -1,0 +1,36 @@
+[{
+    "service": "routeguide.RouteGuide",
+    "method": "GetFeature",
+    "in": {
+        "equals": {
+            "latitude": 100,
+            "longitude": 200
+        }
+    },
+    "out": {
+        "data": {
+            "name": "equals",
+            "location": {
+                "latitude": 100,
+                "longitude": 200
+            }
+        }
+    }
+},{
+    "service": "routeguide.RouteGuide",
+    "method": "GetFeature",
+    "in": {
+        "contains": {
+            "latitude": 200
+        }
+    },
+    "out": {
+        "data": {
+            "name": "contains",
+            "location": {
+                "latitude": 200,
+                "longitude":0 
+            }
+        }
+    }
+}]

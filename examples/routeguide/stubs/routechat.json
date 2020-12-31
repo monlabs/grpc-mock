@@ -1,0 +1,22 @@
+[{
+    "service": "routeguide.RouteGuide",
+    "method": "RouteChat",
+    "in": {
+        "equals": {
+            "location": {
+                "latitude": 100,
+                "longitude": 200
+            },
+            "message": "hello foo"
+        }
+    },
+    "out": {
+        "data": {
+            "location": {
+                "latitude": 100,
+                "longitude": 200
+            },
+            "message": "hello bar"
+        }
+    }
+}]

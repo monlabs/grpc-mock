@@ -1,0 +1,25 @@
+[{
+    "service": "routeguide.RouteGuide",
+    "method": "ListFeatures",
+    "in": {
+        "equals": {
+            "lo": {
+                "latitude": 100,
+                "longitude": 200
+            },
+            "hi": {
+                "latitude": 300,
+                "longitude": 400
+            }
+        }
+    },
+    "out": {
+        "data": {
+            "name": "equals",
+            "location": {
+                "latitude": 200,
+                "longitude": 300
+            }
+        }
+    }
+}]

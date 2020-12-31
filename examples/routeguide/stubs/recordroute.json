@@ -1,0 +1,18 @@
+[{
+    "service": "routeguide.RouteGuide",
+    "method": "RecordRoute",
+    "in": {
+        "equals": {
+            "latitude": 100,
+            "longitude": 200
+        }
+    },
+    "out": {
+        "data": {
+            "point_count": 1,
+            "feature_count": 1,
+            "distance": 100,
+            "elapsed_time": 60
+        }
+    }
+}]
