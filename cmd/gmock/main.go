@@ -5,13 +5,13 @@ import (
 	"compress/gzip"
 	"context"
 	"flag"
-	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jhump/protoreflect/desc"
@@ -53,23 +53,23 @@ func main() {
 
 	fds, err := parseProtos(importPaths.Elements, protoFiles.Elements)
 	if err != nil {
-		log.Panicf("parse proto files failed: %v", err)
+		log.Fatalf("parse proto files failed: %v", err)
 	}
 	if len(fds) == 0 {
-		log.Println("no parsed file descriptors")
+		log.Infoln("no parsed file descriptors")
 		return
 	}
 
 	err = registerFileDescriptors(fds)
 	if err != nil {
-		log.Panicf("register file descriptors failed: %v", err)
+		log.Fatalf("register file descriptors failed: %v", err)
 	}
 
 	stubMgr := stub.NewManager()
 	if stubDir != "" {
 		err = stubMgr.LoadStubsFromFile(stubDir)
 		if err != nil {
-			log.Panicf("load stubs from file failed: %v", err)
+			log.Fatalf("load stubs from file failed: %v", err)
 		}
 	}
 	go startAPIServer(apiAddr, api.NewServer(stubMgr))
@@ -77,7 +77,7 @@ func main() {
 	mockServer := mock.NewServer(mockAddr, stubMgr)
 	err = mockServer.Start()
 	if err != nil {
-		log.Panicf("start mock server failed: %v", err)
+		log.Fatalf("start mock server failed: %v", err)
 	}
 	defer mockServer.Stop()
 	mockServer.RegisterServices(fds)
@@ -125,11 +125,11 @@ func registerFileDescriptors(fds []*desc.FileDescriptor) (err error) {
 		fdp := protodesc.ToFileDescriptorProto(fd)
 		descBytes, err = createFileDescriptorBytes(fdp)
 		if err != nil {
-			log.Printf("register proto '%s' failed: %v", fd.Path(), err)
+			log.Infof("register proto '%s' failed: %v", fd.Path(), err)
 			return false
 		}
 		proto.RegisterFile(fd.Path(), descBytes)
-		log.Println("register proto", fd.Path())
+		log.Infoln("register proto", fd.Path())
 		return true
 	})
 	return
@@ -154,16 +154,16 @@ func createFileDescriptorBytes(fdp *dppb.FileDescriptorProto) ([]byte, error) {
 func startAPIServer(addr string, svr mockpb.MockServer) {
 	lsn, err := net.Listen("tcp4", addr)
 	if err != nil {
-		log.Panicf("api server listen failed: %v", err)
+		log.Fatalf("api server listen failed: %v", err)
 	}
 
 	mux := runtime.NewServeMux()
 	mockpb.RegisterMockHandlerServer(context.Background(), mux, svr)
 
-	log.Printf("api server starts on %v", lsn.Addr().String())
+	log.Infof("api server starts on %v", lsn.Addr().String())
 	err = http.Serve(lsn, mux)
 	if err != nil {
-		log.Panicf("api server serve failed: %v", err)
+		log.Fatalf("api server serve failed: %v", err)
 	}
 }
 
@@ -171,15 +171,15 @@ func startMockServer(addr string, sds []*grpc.ServiceDesc) {
 	s := grpc.NewServer()
 	lsn, err := net.Listen("tcp4", addr)
 	if err != nil {
-		log.Panicf("grpc mock server listen failed: %v", err)
+		log.Fatalf("grpc mock server listen failed: %v", err)
 	}
-	log.Printf("grpc mock server starts on %v", lsn.Addr().String())
+	log.Infof("grpc mock server starts on %v", lsn.Addr().String())
 	for _, sd := range sds {
 		s.RegisterService(sd, nil)
 	}
 	reflection.Register(s)
 	err = s.Serve(lsn)
 	if err != nil {
-		log.Panicf("grpc mock server serve failed: %v", err)
+		log.Fatalf("grpc mock server serve failed: %v", err)
 	}
 }

@@ -6,11 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"sync"
 	"time"
 
+	log "github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
@@ -58,7 +58,7 @@ func (s *Server) Start() (err error) {
 	if err != nil {
 		return fmt.Errorf("mock server: listen on '%s' failed: %v", s.addr, err)
 	}
-	log.Printf("mock server starts on %v", lsn.Addr().String())
+	log.Infof("mock server starts on %v", lsn.Addr().String())
 	reflection.Register(s.svr)
 	s.wg.Add(1)
 	go func() {
