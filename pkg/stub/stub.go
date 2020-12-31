@@ -72,7 +72,7 @@ func equals(pattern, in map[string]interface{}) bool {
 func contains(pattern, in map[string]interface{}) bool {
 	for k, v := range in {
 		p := pattern[k]
-		if p == nil || reflect.DeepEqual(p, v) {
+		if p == nil || !reflect.DeepEqual(p, v) {
 			return false
 		}
 	}
