@@ -2,9 +2,10 @@ package stub
 
 import (
 	"errors"
-	"log"
 	"reflect"
 	"regexp"
+
+	log "github.com/golang/glog"
 )
 
 type Stub struct {
@@ -51,7 +52,7 @@ func (s *Stub) Match(in map[string]interface{}) bool {
 	}
 
 	if s.In.Equals != nil {
-		return reflect.DeepEqual(s.In.Equals, in)
+		return equals(s.In.Equals, in)
 	}
 
 	if s.In.Contains != nil {
@@ -93,7 +94,7 @@ func matches(pattern, in map[string]interface{}) bool {
 
 		match, err := regexp.Match(pStr, []byte(valStr))
 		if err != nil {
-			log.Printf("match regexp '%s' with '%s' failed: %v", pStr, valStr, err)
+			log.Errorf("match regexp '%s' with '%s' failed: %v", pStr, valStr, err)
 		}
 
 		if !match {
