@@ -1,2 +1,87 @@
 # grpc-mock
-A simple tool for creating gRPC mock server.
+grpc-mock is yet another grpc mock server inspired by [GripMock](https://github.com/tokopedia/gripmock).
+
+grpc-mock implements the grpc mock server by reflections of `.proto` files instead of code generation that [GripMock](https://github.com/tokopedia/gripmock) does.
+
+# Installation
+## From Source
+Use `go` tool to install:
+```shell
+go get github.com/monlabs/grpc-mock/cmd/gmock
+```
+# Quick Usage
+**Step 1:** Write your proto file which should contains at least one `service`.
+> helloworld.proto
+```protobuf
+syntax = "proto3";
+
+package helloworld;
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+```
+**Step 2:** Write the stub files in `JSON` format for the services defined in the proto file.
+> stubs/helloworld.json
+```JSON
+[
+  {
+    "service": "helloworld.Greeter",
+    "method": "SayHello",
+    "in": {
+      "equals": {
+        "name": "hi"
+      }
+    },
+    "out": {
+      "data": {
+        "message": "lemon"
+      }
+    }
+  },
+  {
+    "service": "helloworld.Greeter",
+    "method": "SayHello",
+    "in": {
+      "matches": {
+        "name": "^[0-9]+$"
+      }
+    },
+    "out": {
+      "data": {
+        "message": "hi numbers"
+      }
+    }
+  }
+]
+```
+**Step 3:** Start the grpc mock server.
+
+`./stubs` is the directory where all stub files reside.
+```Bash
+grpc-mock -mock-addr :22222 -import-path . -proto helloworld.proto -stub-dir ./stubs
+```
+The flag `mock-addr` defines the address mock server listens on.
+**Step 4:** Ready to test it.
+We use `grpcurl` to invoke rpc methods.
+```Bash
+grpcurl -plaintext -d '{"name": "01"}' localhost:22222 helloworld.Greeter/SayHello
+```
+The output is:
+```JSON
+{
+  "message": "hi numbers"
+}
+```
