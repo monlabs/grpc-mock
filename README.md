@@ -74,6 +74,7 @@ message HelloReply {
 grpc-mock -mock-addr :22222 -import-path . -proto helloworld.proto -stub-dir ./stubs
 ```
 The flag `mock-addr` defines the address mock server listens on.
+
 **Step 4:** Ready to test it.
 We use `grpcurl` to invoke rpc methods.
 ```Bash
