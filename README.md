@@ -89,7 +89,7 @@ The output is:
 ```
 More [examples](https://github.com/monlabs/grpc-mock/tree/main/examples)
 ## Stubs
-The input and expected output comprise of a `Stub`. When a request is received, the mock server tries to match the stub with the request, and then reponds with the expected output in the matched stub once it's matched. There're two ways to manage your stubs: static and dynamic.
+The input and expected output comprise of a `Stub`. When a request is received, the mock server tries to match the stub with the request, and then reponds with the expected output in the matched stub. There're two ways to manage your stubs: static and dynamic.
 ### Static: predefine stubs in files.
 Like in the example above, you save the stubs in files. Let the mock server load them on starting.
 ### Dynamic: call API to CRUD stubs.
@@ -99,4 +99,5 @@ You also can start the mock server without specified stubs and call the admin AP
 - `POST /v1/stubs`: create stubs.
 - `DELETE /v1/stubs`: delete stubs.
 
-### Match Rules
+### Matching Rules
+grpc-mock has the same matching rules as [gripmock](https://github.com/tokopedia/gripmock).
