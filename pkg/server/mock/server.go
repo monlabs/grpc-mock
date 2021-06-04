@@ -11,6 +11,7 @@ import (
 	"time"
 
 	log "github.com/golang/glog"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
@@ -31,6 +32,7 @@ type Server struct {
 	svr     *grpc.Server
 	matcher StubMatcher
 	wg      sync.WaitGroup
+	mshlr   jsonpb.Marshaler
 }
 
 func NewServer(addr string, m StubMatcher) *Server {
@@ -38,6 +40,7 @@ func NewServer(addr string, m StubMatcher) *Server {
 		addr:    addr,
 		svr:     grpc.NewServer(),
 		matcher: m,
+		mshlr:   jsonpb.Marshaler{OrigName: true},
 	}
 }
 
@@ -99,9 +102,9 @@ func (s *Server) createUnaryServerHandler(md *desc.MethodDescriptor) func(srv in
 			out proto.Message
 			err error
 		)
-		data, _ := json.Marshal(in)
+		data, _ := s.mshlr.MarshalToString(in)
 		m := make(map[string]interface{})
-		json.Unmarshal(data, &m)
+		json.Unmarshal([]byte(data), &m)
 		expects := s.matcher.FindStubs(md.GetService().GetFullyQualifiedName(), md.GetName(), m)
 		if len(expects) == 0 {
 			return nil, status.Error(codes.NotFound, "didn't match any stub")
@@ -135,9 +138,9 @@ func (s *Server) createStreamServerHandler(md *desc.MethodDescriptor) func(srv i
 			out proto.Message
 			err error
 		)
-		data, _ := json.Marshal(in)
+		data, _ := s.mshlr.MarshalToString(in)
 		m := make(map[string]interface{})
-		json.Unmarshal(data, &m)
+		json.Unmarshal([]byte(data), &m)
 		expects := s.matcher.FindStubs(md.GetService().GetFullyQualifiedName(), md.GetName(), m)
 		if len(expects) == 0 {
 			return status.Error(codes.NotFound, "didn't match any stub")
@@ -174,9 +177,9 @@ func (s *Server) createClientStreamServerHandler(md *desc.MethodDescriptor) func
 					out proto.Message
 					err error
 				)
-				data, _ := json.Marshal(in)
+				data, _ := s.mshlr.MarshalToString(in)
 				m := make(map[string]interface{})
-				json.Unmarshal(data, &m)
+				json.Unmarshal([]byte(data), &m)
 				expects := s.matcher.FindStubs(md.GetService().GetFullyQualifiedName(), md.GetName(), m)
 				if len(expects) == 0 {
 					return status.Error(codes.NotFound, "didn't match any stub")
@@ -218,9 +221,9 @@ func (s *Server) createServerStreamServerHandler(md *desc.MethodDescriptor) func
 			out proto.Message
 			err error
 		)
-		data, _ := json.Marshal(in)
+		data, _ := s.mshlr.MarshalToString(in)
 		m := make(map[string]interface{})
-		json.Unmarshal(data, &m)
+		json.Unmarshal([]byte(data), &m)
 		expects := s.matcher.FindStubs(md.GetService().GetFullyQualifiedName(), md.GetName(), m)
 		if len(expects) == 0 {
 			return status.Error(codes.NotFound, "didn't match any stub")
@@ -261,9 +264,9 @@ func (s *Server) createBidiStreamServerHandler(md *desc.MethodDescriptor) func(s
 			var (
 				out proto.Message
 			)
-			data, _ := json.Marshal(in)
+			data, _ := s.mshlr.MarshalToString(in)
 			m := make(map[string]interface{})
-			json.Unmarshal(data, &m)
+			json.Unmarshal([]byte(data), &m)
 			expects := s.matcher.FindStubs(md.GetService().GetFullyQualifiedName(), md.GetName(), m)
 			if len(expects) == 0 {
 				return status.Error(codes.NotFound, "didn't match any stub")
