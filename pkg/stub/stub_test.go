@@ -22,12 +22,12 @@ func TestStubValidate(t *testing.T) {
 			in:   &Stub{Service: "srv.fake.tt"},
 			want: errors.New("missing method"),
 		}, {
-			name: "missing input",
+			name: "valid no input",
 			in: &Stub{
 				Service: "srv.fake.tt",
 				Method:  "Hello",
+				Out:     &Output{},
 			},
-			want: errors.New("missing input"),
 		}, {
 			name: "invalid input",
 			in: &Stub{
@@ -241,6 +241,17 @@ func TestStubMatch(t *testing.T) {
 					},
 				},
 				Out: &Output{},
+			},
+			in: map[string]interface{}{
+				"name": "foo",
+			},
+			want: true,
+		}, {
+			name: "no-input-match",
+			st: &Stub{
+				Service: "srv.fake.tt",
+				Method:  "Hello",
+				Out:     &Output{},
 			},
 			in: map[string]interface{}{
 				"name": "foo",
