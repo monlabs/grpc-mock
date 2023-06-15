@@ -34,10 +34,7 @@ func (s *Stub) Validate() error {
 	if s.Method == "" {
 		return errors.New("missing method")
 	}
-	if s.In == nil {
-		return errors.New("missing input")
-	}
-	if len(s.In.Equals) == 0 && len(s.In.Contains) == 0 && len(s.In.Matches) == 0 {
+	if s.In != nil && len(s.In.Equals) == 0 && len(s.In.Contains) == 0 && len(s.In.Matches) == 0 {
 		return errors.New("require at least one of equals, contains or matches")
 	}
 	if s.Out == nil {
@@ -48,7 +45,7 @@ func (s *Stub) Validate() error {
 
 func (s *Stub) Match(in map[string]interface{}) bool {
 	if s.In == nil {
-		return false
+		return true
 	}
 
 	if s.In.Equals != nil {
