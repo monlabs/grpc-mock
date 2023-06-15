@@ -75,12 +75,12 @@ func main() {
 	go startAPIServer(apiAddr, api.NewServer(stubMgr))
 
 	mockServer := mock.NewServer(mockAddr, stubMgr)
+	mockServer.RegisterServices(fds)
 	err = mockServer.Start()
 	if err != nil {
 		log.Fatalf("start mock server failed: %v", err)
 	}
 	defer mockServer.Stop()
-	mockServer.RegisterServices(fds)
 
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGPIPE, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGABRT)
